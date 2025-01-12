@@ -3,7 +3,7 @@ import path from 'path';
 import traverse from "@babel/traverse";
 import generate from "@babel/generator";
 import {parse} from "@babel/parser";
-import t from "@babel/types";
+import { isMemberExpression, identifier, memberExpression } from "@babel/types";
 
 
 async function listFiles(dir: string): Promise<string[]> {
@@ -31,11 +31,11 @@ async function patchCode(code: string): Promise<string> {
 
     traverse(ast, {
         CallExpression: function (path) {
-            if (t.isMemberExpression(path.node.callee)) {
+            if (isMemberExpression(path.node.callee)) {
                 // Example: Change "console.log" to "myLogger.log"
-                path.node.callee = t.memberExpression(
-                    t.identifier("myLogger"),
-                    t.identifier("log")
+                path.node.callee = memberExpression(
+                    identifier("myLogger"),
+                    identifier("log")
                 );
             }
         },
