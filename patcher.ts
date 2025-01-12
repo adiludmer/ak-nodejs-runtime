@@ -3,7 +3,7 @@ import path from 'path';
 import traverse from "@babel/traverse";
 import generate from "@babel/generator";
 import {parse} from "@babel/parser";
-import { isMemberExpression, identifier, memberExpression } from "@babel/types";
+import { isMemberExpression, identifier, isIdentifier, stringLiteral } from "@babel/types";
 
 
 async function listFiles(dir: string): Promise<string[]> {
@@ -26,23 +26,29 @@ async function listFiles(dir: string): Promise<string[]> {
 
 
 
-async function patchCode(code: string): Promise<string> {
+export async function patchCode(code: string): Promise<string> {
     const ast = parse(code);
 
     traverse(ast, {
         CallExpression: function (path) {
+            let originalFunc = "";
+
             if (isMemberExpression(path.node.callee)) {
-                // Example: Change "console.log" to "myLogger.log"
-                path.node.callee = memberExpression(
-                    identifier("myLogger"),
-                    identifier("log")
-                );
+                if (isIdentifier(path.node.callee.object) && isIdentifier(path.node.callee.property)) {
+                    originalFunc = path.node.callee.object.name + "." + path.node.callee.property.name;
+                }
             }
+
+            if (isIdentifier(path.node.callee)) {
+                originalFunc = path.node.callee.name;
+            }
+
+            path.node.callee = identifier("ak");
+            path.node.arguments.push(stringLiteral(originalFunc));
         },
     })
 
-    const patched = generate(ast)
-    return patched.code
+    return  generate(ast, {compact: true, minified: true}).code;
 }
 
 
