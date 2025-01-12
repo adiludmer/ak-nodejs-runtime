@@ -8,7 +8,7 @@ function add(a: number,b: number): number {
     return a + b;
 }
 
-let code = add.toString();
+const code = add.toString();
 
 
 const ast = parse(code);
