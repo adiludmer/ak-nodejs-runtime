@@ -1,6 +1,6 @@
 import { patchCode } from './patcher';
 
-test('test patch identifier', async () => {
+test('test patch function call', async () => {
     const code = `function some_func() { 
         a("hi");
     }`;
@@ -9,7 +9,7 @@ test('test patch identifier', async () => {
     expect(await patchCode(code)).toEqual(patchedCode);
 });
 
-test('test patch member', async () => {
+test('test patch member call', async () => {
     const code = `function some_func() { 
         a.b("hi");
     }`;
